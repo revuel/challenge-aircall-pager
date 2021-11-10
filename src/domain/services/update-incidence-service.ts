@@ -36,7 +36,7 @@ export class UpdateIncidenceService implements WebConsolePort {
      */
     closeIncidence(serviceUuid: uuid4): any {
         try {
-
+            this.persistenceService.deleteUnhealthyService(serviceUuid);
         } catch (error) {
             throw new PagerServiceError(error.message);
         }
@@ -48,7 +48,9 @@ export class UpdateIncidenceService implements WebConsolePort {
      */
     acknowledgeIncidence(serviceUuid: uuid4): any {
         try {
-
+            let monitoredService = this.persistenceService.readUnhealthyService(serviceUuid);
+            monitoredService.acknowledged = true;
+            this.persistenceService.updateUnhealthyService(monitoredService);
         } catch (error) {
             throw new PagerServiceError(error.message);
         }
