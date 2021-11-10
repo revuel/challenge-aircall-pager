@@ -1,0 +1,14 @@
+{
+  "compilerOptions": {
+    "target": "ES2021",
+    "moduleResolution": "Node",
+    "esModuleInterop": true,
+    "plugins": [
+      { "transform": "ts-auto-mock/transformer", "cacheBetweenTests": false }
+    ],
+    "baseUrl": ".",
+    "paths": {
+      "jest-ts-auto-mock": ["../../index"]
+    }
+  }
+}
