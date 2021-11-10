@@ -67,7 +67,28 @@ export class EscalateIncidenceService implements TimerTimeoutPort {
      */
     escalateIncidence(serviceUuid: uuid4): any {
         try {
+            // 0)
+            let monitoredService = this.persistenceService.readUnhealthyService(serviceUuid);
 
+            if (monitoredService !== undefined && monitoredService.acknowledged === false) {
+                // 1)
+                let escalationPolicies = this.escalationPoliciesService.readEscalationPolicy(serviceUuid);
+                let nextEscalationPolicy = monitoredService.currentEscalationLevel + 1;
+
+                // 2)
+                let nextLevel = escalationPolicies.escalationLevels[nextEscalationPolicy];
+                nextLevel.emailTargets.forEach(target => {
+                    this.mailService.sendMail(new EmailNotification(monitoredService, target));
+                });
+                nextLevel.smsTargets.forEach(target => {
+                    this.smsService.sendSMS(new SmsNotification(monitoredService, target));
+                });
+                // 3)
+                this.timerStartService.startTimer(serviceUuid, 15);
+                // 4)
+                monitoredService.currentEscalationLevel += 1;
+                this.persistenceService.updateUnhealthyService(monitoredService);
+            }
         } catch (error) {
             throw new PagerServiceError(error.message);
         }
