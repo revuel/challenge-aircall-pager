@@ -78,7 +78,9 @@ Ports from the infrastructure layer are just the interfaces, no adapters impleme
 
 ## Run (test)
 
-`npm test`
+`npm install` (download dependencies)
+
+`npm test` (verify Unit Test Cases)
 
 ## Decisions
 
