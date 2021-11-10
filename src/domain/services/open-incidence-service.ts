@@ -64,7 +64,26 @@ export class OpenIncidenceService implements AlertingPort {
      */
     openIncidence(serviceUuid: uuid4, alertMsg: string): any {
         try {
+            // 0)
+            let monitoredService = this.persistenceService.readUnhealthyService(serviceUuid);
 
+            if (monitoredService === undefined) {
+                // 1)
+                let unhealthyService = this.persistenceService.createUnhealthyService(serviceUuid); // TODO review
+                // 2)
+                let monitoredServiceEscalationPolicies =
+                    this.escalationPoliciesService.readEscalationPolicy(serviceUuid);
+                // 3)
+                let firstLevel = monitoredServiceEscalationPolicies.escalationLevels[0];
+                firstLevel.emailTargets.forEach(target => {
+                    this.mailService.sendMail(new EmailNotification(unhealthyService, target));
+                });
+                firstLevel.smsTargets.forEach(target => {
+                    this.smsService.sendSMS(new SmsNotification(unhealthyService, target));
+                });
+                // 4)
+                this.timerStartService.startTimer(serviceUuid, 15);
+            }
         } catch (error) {
             throw new PagerServiceError(error.message)
         }
