@@ -7,10 +7,12 @@
 import { v4 as uuid4 } from 'uuid';
 
 /**
- * TODO remove?
+ * Fix proposal option A: interface with generic recipient
  */
 export interface Target {
-    // N/A
+    readonly _recipient: string;
+
+    get recipient(): string;
 }
 
 /**
@@ -19,18 +21,18 @@ export interface Target {
  */
 export class EmailTarget implements Target {
 
-    private readonly _emailAddress: string;
+    readonly _recipient: string;
 
     /**
      * Regular constructor
      * @param emailAddress a string representing an email address
      */
     constructor(emailAddress: string) {
-        this._emailAddress = emailAddress;
+        this._recipient = emailAddress;
     }
 
-    public get emailAddress() {
-        return this._emailAddress;
+    public get recipient(): string {
+        return this._recipient;
     }
 }
 
@@ -39,18 +41,18 @@ export class EmailTarget implements Target {
  */
 export class SmsTarget implements Target {
 
-    private readonly _phoneNumber: number;
+    readonly _recipient: string;
 
     /**
      * Regular constructor
      * @param phoneNumber number representing a phone number
      */
-    constructor(phoneNumber: number) {
-        this._phoneNumber = phoneNumber;
+    constructor(phoneNumber: string) {
+        this._recipient = phoneNumber;
     }
 
-    public get phoneNumber() {
-        return this._phoneNumber;
+    public get recipient(): string {
+        return this._recipient;
     }
 }
 
@@ -60,31 +62,28 @@ export class SmsTarget implements Target {
 export class EscalationLevel {
 
     private readonly _level: number;
-    private readonly _emailTargets: Array<EmailTarget>;
-    private readonly _smsTargets: Array<SmsTarget>;
+    private readonly _targets: Array<Target>;
 
     /**
      * Regular constructor
      * @param level Ordinal number of this level
-     * @param emailTargets Array of EmailTarget
-     * @param smsTargets Array of SmsTarget
+     * @param targets Array of Target
      */
-    constructor(level: number, emailTargets: Array<EmailTarget>, smsTargets: Array<SmsTarget>) {
+    constructor(level: number, targets: Array<Target>) {
         this._level = level;
-        this._emailTargets = emailTargets;
-        this._smsTargets = smsTargets;
+        this._targets = targets;
     }
 
     public get level() {
         return this._level;
     }
 
-    public get emailTargets() {
-        return this._emailTargets;
+    public get emailTargets(): Array<EmailTarget> {
+        return this._targets.filter(target => target instanceof EmailTarget)
     }
 
-    public get smsTargets() {
-        return this._smsTargets;
+    public get smsTargets(): Array<SmsTarget> {
+        return this._targets.filter(target => target instanceof SmsTarget)
     }
 }
 

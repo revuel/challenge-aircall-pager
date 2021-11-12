@@ -81,11 +81,11 @@ export const getMockedEscalationPoliciesService = (serviceUuid) => {
     emailTargets.push(new EmailTarget('fake-email@undefined.com'));
 
     let smsTargets = []
-    smsTargets.push(new SmsTarget(42));
+    smsTargets.push(new SmsTarget('42'));
 
     let escalationLevels = [];
-    escalationLevels.push(new EscalationLevel(0, emailTargets, smsTargets));
-    escalationLevels.push(new EscalationLevel(1, emailTargets, smsTargets));
+    escalationLevels.push(new EscalationLevel(0, emailTargets.concat(smsTargets)));
+    escalationLevels.push(new EscalationLevel(1, emailTargets.concat(smsTargets)));
 
     let escalationPoliciesService = new EscalationPolicy(serviceUuid, escalationLevels);
 
