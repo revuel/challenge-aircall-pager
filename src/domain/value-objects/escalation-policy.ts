@@ -7,50 +7,52 @@
 import { v4 as uuid4 } from 'uuid';
 
 /**
- * TODO remove?
+ * Just Targets Option A: Convert Target to a superclass
  */
-export interface Target {
-    // N/A
+export class Target {
+    protected readonly _emailAddress?: string;
+    protected readonly _phoneNumber?: number;
+
+    constructor(emailAddress?: string, phoneNumber?: number) {
+        this._emailAddress = emailAddress;
+        this._phoneNumber = phoneNumber;
+    }
+
+    public get emailAddress() {
+        return this._emailAddress;
+    }
+
+    public get phoneNumber() {
+        return this._phoneNumber;
+    }
 }
 
 /**
  * EmailTarget V.O.
  * Notes: for the shake of simplicity, emailAddress is just a string instead of a more realistic additional Email V.O.
  */
-export class EmailTarget implements Target {
-
-    private readonly _emailAddress: string;
+export class EmailTarget extends Target {
 
     /**
      * Regular constructor
      * @param emailAddress a string representing an email address
      */
     constructor(emailAddress: string) {
-        this._emailAddress = emailAddress;
-    }
-
-    public get emailAddress() {
-        return this._emailAddress;
+        super(emailAddress)
     }
 }
 
 /**
  * Notes: for the shake of simplicity, phoneNumber is just a num instead of a more realistic additional PhoneNumber V.O.
  */
-export class SmsTarget implements Target {
-
-    private readonly _phoneNumber: number;
+export class SmsTarget extends Target {
 
     /**
      * Regular constructor
      * @param phoneNumber number representing a phone number
      */
     constructor(phoneNumber: number) {
-        this._phoneNumber = phoneNumber;
-    }
-
-    public get phoneNumber() {
-        return this._phoneNumber;
+        super(undefined, phoneNumber);
     }
 }
 
@@ -60,31 +62,28 @@ export class SmsTarget implements Target {
 export class EscalationLevel {
 
     private readonly _level: number;
-    private readonly _emailTargets: Array<EmailTarget>;
-    private readonly _smsTargets: Array<SmsTarget>;
+    private readonly _targets: Array<Target>;
 
     /**
      * Regular constructor
      * @param level Ordinal number of this level
-     * @param emailTargets Array of EmailTarget
-     * @param smsTargets Array of SmsTarget
+     * @param targets Array of Target
      */
-    constructor(level: number, emailTargets: Array<EmailTarget>, smsTargets: Array<SmsTarget>) {
+    constructor(level: number, targets: Array<Target>) {
         this._level = level;
-        this._emailTargets = emailTargets;
-        this._smsTargets = smsTargets;
+        this._targets = targets;
     }
 
     public get level() {
         return this._level;
     }
 
-    public get emailTargets() {
-        return this._emailTargets;
+    public get emailTargets(): Array<EmailTarget> {
+        return this._targets.filter(target => target instanceof EmailTarget);
     }
 
-    public get smsTargets() {
-        return this._smsTargets;
+    public get smsTargets(): Array<SmsTarget> {
+        return this._targets.filter(target => target instanceof SmsTarget);
     }
 }
 
